@@ -158,6 +158,40 @@ body {
   resize: vertical;
 }
 
+/* Security Warnings */
+.security-warning {
+  margin: 10px 0;
+  padding: 12px 15px;
+  background: #fff5f5;
+  border: 2px solid #fc8181;
+  border-radius: 6px;
+  color: #c53030;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.wildcard-warning {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #fffaf0;
+  border: 1px solid #fbd38d;
+  border-radius: 6px;
+  color: #744210;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.wildcard-warning strong {
+  color: #c05621;
+}
+
+.wildcard-warning code {
+  background: #fed7d7;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
 /* ===========================================================================
  * MESSAGE LOG
  * =========================================================================== */
@@ -208,11 +242,26 @@ body {
   background: rgba(245, 101, 101, 0.1);
 }
 
+.log-insecure {
+  border-left: 3px solid #f6ad55 !important;
+  background: rgba(246, 173, 85, 0.1);
+}
+
 .log-header {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 5px;
+}
+
+.insecure-badge {
+  background: #fed7d7;
+  color: #c53030;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
 
 .log-icon {

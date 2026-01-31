@@ -70,15 +70,26 @@ HOW TO TEST:
             </p>
           </div>
           
+          <!-- Security Warning (shown when validation is off) -->
+          <div id="security-warning" class="security-warning" style="display: none;">
+            ⚠️ <strong>Security Warning:</strong> Origin validation is DISABLED. 
+            All messages from ANY source will be accepted. This is dangerous in production!
+          </div>
+          
           <div class="config-item">
             <label>
               <strong>Allowed Origins:</strong>
             </label>
             <textarea id="allowed-origins" rows="3" class="config-textarea">*</textarea>
             <p class="config-description">
-              One origin per line. Use * to allow all (less secure).
-              For real apps, list specific origins like https://example.com
+              One origin per line. For real apps, list specific origins like https://example.com
             </p>
+            <div class="wildcard-warning" id="wildcard-warning">
+              ⚠️ <strong>Current setting: "*" (wildcard)</strong><br>
+              This means "allow all origins" - convenient for testing but <strong>less secure</strong>. 
+              In production, always specify exact origins like:<br>
+              <code>https://your-external-content.com</code>
+            </div>
           </div>
         </div>
         
@@ -287,8 +298,10 @@ window.addEventListener('message', (e) => {
       }
       
       // STEP 2: LOG THE MESSAGE (for demo visualization)
+      const messageType = event.data?.type || 'unknown';
+      const isValidationOn = isValidationEnabled();
       logMessage('parent-log', 'received', 
-        `From: ${event.origin}`, event.data);
+        `📨 Received: ${messageType.toUpperCase()}`, event.data, !isValidationOn);
       
       // STEP 3: PROCESS THE MESSAGE
       handleMessage(event);
@@ -361,10 +374,16 @@ window.addEventListener('message', (e) => {
       console.log('📤 Sending acknowledgment:', ack);
       
       // Send to the specific origin, or '*' if we don't know it
-      const origin = targetOrigin || '*';
+      // Handle file:// URLs where origin is "null"
+      let origin = targetOrigin;
+      if (!origin || origin === 'null') {
+        origin = '*';
+      }
+      
       targetWindow.postMessage(ack, origin);
       
-      logMessage('parent-log', 'sent', `Ack to: ${origin}`, ack);
+      logMessage('parent-log', 'sent', 
+        `↩️ Sent ACK for: ${ack.originalType.toUpperCase()}`, ack);
     }
     
     /* =========================================================================
@@ -411,8 +430,13 @@ window.addEventListener('message', (e) => {
      * LOG MESSAGE TO UI
      * =================
      * Adds a visual entry to the message log panel.
+     * @param {string} logId - ID of the log container
+     * @param {string} direction - 'received', 'sent', or 'blocked'
+     * @param {string} label - Display label for the message
+     * @param {*} data - Message data to display
+     * @param {boolean} insecure - Whether to show insecure warning styling
      */
-    function logMessage(logId, direction, label, data) {
+    function logMessage(logId, direction, label, data, insecure = false) {
       const log = document.getElementById(logId);
       
       // Remove placeholder if it exists
@@ -423,6 +447,11 @@ window.addEventListener('message', (e) => {
       const entry = document.createElement('div');
       entry.className = `log-entry log-${direction}`;
       
+      // Add insecure styling if validation is off
+      if (insecure && direction === 'received') {
+        entry.classList.add('log-insecure');
+      }
+      
       // Icon based on direction
       const icons = {
         received: '📥',
@@ -430,10 +459,16 @@ window.addEventListener('message', (e) => {
         blocked: '🚫'
       };
       
+      // Add origin info for received messages
+      const originInfo = data?.origin || '';
+      const insecureWarning = insecure ? 
+        '<span class="insecure-badge">⚠️ VALIDATION OFF</span>' : '';
+      
       entry.innerHTML = `
         <div class="log-header">
           <span class="log-icon">${icons[direction] || '•'}</span>
           <span class="log-label">${label}</span>
+          ${insecureWarning}
           <span class="log-time">${new Date().toLocaleTimeString()}</span>
         </div>
         <pre class="log-data">${JSON.stringify(data, null, 2)}</pre>
@@ -442,8 +477,8 @@ window.addEventListener('message', (e) => {
       // Add to top of log
       log.insertBefore(entry, log.firstChild);
       
-      // Keep only last 10 entries
-      while (log.children.length > 10) {
+      // Keep only last 15 entries (increased from 10 to show more messages)
+      while (log.children.length > 15) {
         log.removeChild(log.lastChild);
       }
     }
@@ -479,6 +514,40 @@ window.addEventListener('message', (e) => {
     document.getElementById('parent-message').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') sendToChild();
     });
+    
+    /**
+     * TOGGLE SECURITY WARNING
+     * =======================
+     * Show/hide security warning when validation checkbox changes
+     */
+    document.getElementById('validate-origin').addEventListener('change', function() {
+      const warning = document.getElementById('security-warning');
+      warning.style.display = this.checked ? 'none' : 'block';
+    });
+    
+    /**
+     * UPDATE WILDCARD WARNING
+     * =======================
+     * Show/hide wildcard warning based on textarea content
+     */
+    function updateWildcardWarning() {
+      const textarea = document.getElementById('allowed-origins');
+      const warning = document.getElementById('wildcard-warning');
+      const value = textarea.value.trim();
+      
+      // Show warning if using wildcard
+      if (value === '*') {
+        warning.style.display = 'block';
+      } else {
+        warning.style.display = 'none';
+      }
+    }
+    
+    // Initial check
+    updateWildcardWarning();
+    
+    // Update on change
+    document.getElementById('allowed-origins').addEventListener('input', updateWildcardWarning);
     
     console.log('🏠 Parent window loaded and listening for messages');
   </script>
