@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<!--
+==============================================================================
+SCORM LAUNCH PAGE (launch.html)
+==============================================================================
+
+THIS IS THE ENTRY POINT
+-----------------------
+When the LMS launches your SCORM course, THIS is the file that loads first.
+Its jobs are:
+  1. Find and connect to the LMS's SCORM API
+  2. Create an iframe that loads your external content
+  3. Listen for postMessage events from the iframe
+  4. Relay completion status to the LMS
+
+WHY AN IFRAME?
+--------------
+Your actual course content lives on a different server (GitHub Pages, your
+website, etc.). We can't put that content directly in the SCORM package
+because:
+  - It might be dynamically generated
+  - It might be updated frequently
+  - It might be used by multiple courses
+
+So we use an iframe to "embed" the external content while this page handles
+all the SCORM communication.
+
+SECURITY CONSIDERATION:
+The iframe creates a cross-domain boundary. The LMS domain can't directly
+access JavaScript in the iframe (and vice versa). That's why we use
+postMessage for communication.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCORM Light Wrapper</title>
+  
+  <style>
+    /*
+    MINIMAL STYLING
+    ===============
+    The goal is to make the iframe take up 100% of the available space
+    so learners see only the external content, not this wrapper page.
+    */
+    
+    /* Reset default margins/padding */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    /* Make html and body fill the viewport */
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden; /* Prevent double scrollbars */
+    }
+    
+    /* The iframe should fill the entire page */
+    #content-frame {
+      width: 100%;
+      height: 100%;
+      border: none; /* Remove the default iframe border */
+    }
+    
+    /*
+    Error message styling (only shown if something goes wrong)
+    */
+    #error-message {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #fee;
+      border-bottom: 2px solid #c00;
+      padding: 15px;
+      color: #900;
+      font-family: Arial, sans-serif;
+    }
+    
+    #error-message.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!--
+  ERROR MESSAGE CONTAINER
+  =======================
+  This is hidden by default. If we can't find the SCORM API or something
+  else goes wrong, we'll show a message here so the learner isn't confused.
+  -->
+  <div id="error-message">
+    <strong>⚠️ SCORM Connection Issue:</strong>
+    <span id="error-text"></span>
+  </div>
+  
+  <!--
+  THE IFRAME
+  ==========
+  This is where your external content will appear.
+  
+  IMPORTANT: Replace the URL below with YOUR actual hosted content URL!
+  
+  The 'allow' attribute enables certain features in the iframe:
+  - fullscreen: Allows videos to go fullscreen
+  - autoplay: Allows media to autoplay (if your content needs it)
+  -->
+  <iframe 
+    id="content-frame" 
+    src="https://ericbenong1.github.io/scorm-demos/demo1_scorm_light/external_content/"
+    allow="fullscreen; autoplay"
+    title="Course Content">
+  </iframe>
+  
+  <!--
+  LOAD OUR SCORM PROXY SCRIPT
+  ===========================
+  This script handles:
+  - Finding the LMS API (the "API hunt")
+  - Initializing the SCORM session
+  - Listening for postMessage events
+  - Sending completion data to the LMS
+  -->
+  <script src="scorm_api_proxy.js"></script>
+  
+  <!--
+  INITIALIZATION SCRIPT
+  =====================
+  This runs after the page loads and kicks everything off.
+  -->
+  <script>
+    /**
+     * INITIALIZATION SEQUENCE
+     * =======================
+     * When the page loads, we need to:
+     * 1. Find and connect to the SCORM API
+     * 2. Set up the postMessage listener
+     * 3. Handle the beforeunload event (for when learner closes the window)
+     */
+    
+    // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🚀 SCORM Launch Page: DOM Ready');
+      
+      // Initialize the SCORM connection
+      // This function is defined in scorm_api_proxy.js
+      const initResult = initializeSCORM();
+      
+      if (!initResult.success) {
+        // Show error message to the learner
+        showError(initResult.message);
+        console.error('❌ SCORM Initialization Failed:', initResult.message);
+        
+        // Even if SCORM fails, we still load the content
+        // The learner can view it, just won't get credit
+      } else {
+        console.log('✅ SCORM Initialized Successfully');
+      }
+      
+      // Set up the postMessage listener
+      // This will receive completion signals from the iframe
+      setupMessageListener();
+      
+      // Log the iframe URL for debugging
+      const iframe = document.getElementById('content-frame');
+      console.log('📄 Loading external content from:', iframe.src);
+    });
+    
+    /**
+     * DISPLAY ERROR MESSAGE
+     * =====================
+     * Shows an error banner at the top of the page.
+     * We don't want to completely block the content - the learner
+     * should still be able to view it even if tracking fails.
+     * 
+     * @param {string} message - The error message to display
+     */
+    function showError(message) {
+      const errorDiv = document.getElementById('error-message');
+      const errorText = document.getElementById('error-text');
+      
+      errorText.textContent = message;
+      errorDiv.classList.add('visible');
+    }
+    
+    /**
+     * BEFORE UNLOAD HANDLER
+     * =====================
+     * When the learner closes the course window/tab, we need to
+     * properly terminate the SCORM session.
+     * 
+     * This ensures:
+     * - Any unsaved data is committed
+     * - The LMS knows the session ended properly
+     * - The learner's progress is recorded
+     */
+    window.addEventListener('beforeunload', function(event) {
+      console.log('👋 Window closing - terminating SCORM session');
+      
+      // terminateSCORM is defined in scorm_api_proxy.js
+      terminateSCORM();
+    });
+  </script>
+</body>
+</html>
+
+<!--
+DEBUGGING TIPS FOR THIS PAGE:
+=============================
+
+1. Open Browser Developer Tools (F12) and check the Console tab
+   - You should see "🚀 SCORM Launch Page: DOM Ready"
+   - Then either "✅ SCORM Initialized Successfully" or an error
+
+2. If testing outside an LMS:
+   - You'll see "SCORM API not found" - that's expected!
+   - The content should still load and be viewable
+
+3. Check Network tab to see if iframe content is loading:
+   - Look for requests to your GitHub Pages URL
+   - 404 errors mean the URL is wrong
+
+4. Common issues:
+   - "Mixed content blocked" - Your content must be HTTPS
+   - "X-Frame-Options" - The external site is blocking iframes
+   - Blank iframe - Check the console for errors
+
+SECURITY NOTES:
+===============
+- Only accept postMessages from trusted origins
+- The scorm_api_proxy.js validates the origin of incoming messages
+- Never use '*' as target origin when sending sensitive data
+-->

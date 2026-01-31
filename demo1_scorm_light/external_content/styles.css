@@ -1,0 +1,364 @@
+/**
+ * ==============================================================================
+ * EXTERNAL CONTENT STYLES (styles.css)
+ * ==============================================================================
+ * 
+ * MINIMAL STYLING FOR THE DEMO
+ * ============================
+ * These styles are intentionally simple and functional.
+ * In a real course, you'd have more polished design.
+ * 
+ * The focus here is on:
+ * - Clean, readable layout
+ * - Clear visual hierarchy
+ * - Accessible color contrast
+ * - Mobile-friendly responsive design
+ */
+
+/* ===========================================================================
+ * CSS RESET & BASE STYLES
+ * =========================================================================== */
+
+/**
+ * Universal box-sizing reset
+ * Makes padding/border calculations more intuitive
+ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/**
+ * Base body styles
+ * - Clean sans-serif font for readability
+ * - Subtle gray background to define the "page" area
+ */
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, 
+               Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f5f5f5;
+}
+
+/* ===========================================================================
+ * MAIN CONTAINER
+ * =========================================================================== */
+
+/**
+ * Course container - the "card" that holds the content
+ * - White background to pop against the gray body
+ * - Max-width for readability (text too wide is hard to read)
+ * - Centered with margin: auto
+ */
+.course-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* ===========================================================================
+ * HEADER STYLES
+ * =========================================================================== */
+
+.course-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  text-align: center;
+}
+
+.course-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.course-header .subtitle {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.95rem;
+}
+
+/* ===========================================================================
+ * MAIN CONTENT AREA
+ * =========================================================================== */
+
+.course-content {
+  padding: 30px;
+}
+
+/**
+ * Section spacing
+ */
+.course-content section {
+  margin-bottom: 30px;
+}
+
+.course-content section:last-child {
+  margin-bottom: 0;
+}
+
+/**
+ * Heading styles
+ */
+.course-content h2 {
+  color: #444;
+  font-size: 1.3rem;
+  margin: 0 0 15px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eee;
+}
+
+/**
+ * Lists
+ */
+.course-content ul {
+  padding-left: 25px;
+}
+
+.course-content li {
+  margin-bottom: 8px;
+}
+
+/* ===========================================================================
+ * STEP LIST (How It Works Section)
+ * =========================================================================== */
+
+.step-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.step {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+/**
+ * Step number badge
+ * - Circle with a number
+ * - Accent color to stand out
+ */
+.step-number {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: #667eea;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.step strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.step p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* ===========================================================================
+ * STATUS INDICATOR
+ * =========================================================================== */
+
+.status-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/**
+ * Status states
+ * - Different colors for incomplete vs complete
+ */
+.status-incomplete {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  color: #856404;
+}
+
+.status-complete {
+  background: #d4edda;
+  border: 1px solid #28a745;
+  color: #155724;
+}
+
+.status-icon {
+  font-size: 1.5rem;
+}
+
+/* ===========================================================================
+ * FOOTER & COMPLETE BUTTON
+ * =========================================================================== */
+
+.course-footer {
+  padding: 25px 30px;
+  background: #f8f9fa;
+  text-align: center;
+  border-top: 1px solid #eee;
+}
+
+/**
+ * The main "Complete" button
+ * - Large and prominent
+ * - Green color for positive action
+ * - Hover and disabled states
+ */
+.complete-button {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.complete-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.complete-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.complete-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.complete-button.completed {
+  background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+}
+
+.help-text {
+  margin: 15px 0 0 0;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* ===========================================================================
+ * DEVELOPER INFO PANEL (for demo purposes)
+ * =========================================================================== */
+
+.developer-info {
+  max-width: 800px;
+  margin: 20px auto 0;
+  padding: 20px;
+  background: #2d2d2d;
+  color: #f8f8f2;
+  border-radius: 8px;
+  font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+  font-size: 0.85rem;
+}
+
+.developer-info h3 {
+  margin: 0 0 15px 0;
+  font-size: 1rem;
+  color: #f8f8f2;
+}
+
+.developer-info p {
+  margin: 5px 0;
+}
+
+.developer-info strong {
+  color: #50fa7b;
+}
+
+.developer-info span {
+  color: #8be9fd;
+}
+
+/**
+ * Message log entries
+ */
+#message-log {
+  margin-top: 15px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.log-entry {
+  padding: 5px 10px;
+  margin: 3px 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.log-entry.sent {
+  border-left: 3px solid #50fa7b;
+}
+
+.log-entry.received {
+  border-left: 3px solid #8be9fd;
+}
+
+.log-entry .direction {
+  margin-right: 8px;
+}
+
+/* ===========================================================================
+ * RESPONSIVE DESIGN
+ * =========================================================================== */
+
+/**
+ * Adjustments for smaller screens (phones)
+ */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+  
+  .course-header {
+    padding: 20px;
+  }
+  
+  .course-header h1 {
+    font-size: 1.4rem;
+  }
+  
+  .course-content {
+    padding: 20px;
+  }
+  
+  .step {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .complete-button {
+    width: 100%;
+    padding: 15px 20px;
+  }
+  
+  .developer-info {
+    font-size: 0.75rem;
+  }
+}

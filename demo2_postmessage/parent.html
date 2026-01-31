@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<!--
+==============================================================================
+POSTMESSAGE DEMO - PARENT WINDOW (parent.html)
+==============================================================================
+
+WHAT IS THIS?
+-------------
+This is a standalone demonstration of cross-domain communication using the
+window.postMessage API. It shows the RECEIVING side of the communication.
+
+In the SCORM context, this is like the SCORM wrapper (launch.html) that:
+  - Contains an iframe with external content
+  - Listens for messages from that iframe
+  - Validates message origins for security
+  - Sends acknowledgments back
+
+KEY CONCEPTS DEMONSTRATED:
+--------------------------
+1. Origin validation - Only accepting messages from trusted sources
+2. Message structure - Using consistent message formats
+3. Acknowledgment pattern - Confirming message receipt
+4. beforeunload coordination - Handling window close
+
+HOW TO TEST:
+------------
+1. Open this file directly in a browser (or use a local server)
+2. The child iframe will load automatically
+3. Click buttons to see messages flow
+4. Open browser console (F12) to see detailed logs
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>postMessage Demo - Parent Window</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="demo-container">
+    
+    <!-- Header -->
+    <header class="demo-header">
+      <h1>🔗 postMessage Demo</h1>
+      <p>Cross-Domain Communication Tutorial</p>
+    </header>
+    
+    <div class="demo-layout">
+      
+      <!-- Left Panel: Parent Window Info -->
+      <div class="panel parent-panel">
+        <h2>🏠 Parent Window</h2>
+        <p class="panel-description">
+          This is the "receiver" - like the SCORM wrapper that listens for 
+          completion signals from embedded content.
+        </p>
+        
+        <!-- Configuration Section -->
+        <div class="config-section">
+          <h3>⚙️ Configuration</h3>
+          
+          <div class="config-item">
+            <label>
+              <input type="checkbox" id="validate-origin" checked>
+              <strong>Validate Origin</strong>
+            </label>
+            <p class="config-description">
+              When enabled, only accepts messages from trusted origins.
+              <em>Try unchecking to see the security difference!</em>
+            </p>
+          </div>
+          
+          <div class="config-item">
+            <label>
+              <strong>Allowed Origins:</strong>
+            </label>
+            <textarea id="allowed-origins" rows="3" class="config-textarea">*</textarea>
+            <p class="config-description">
+              One origin per line. Use * to allow all (less secure).
+              For real apps, list specific origins like https://example.com
+            </p>
+          </div>
+        </div>
+        
+        <!-- Message Log -->
+        <div class="log-section">
+          <h3>📬 Received Messages</h3>
+          <div id="parent-log" class="message-log">
+            <div class="log-placeholder">
+              Messages from the child iframe will appear here...
+            </div>
+          </div>
+          <button onclick="clearLog('parent-log')" class="clear-btn">Clear Log</button>
+        </div>
+        
+        <!-- Send to Child -->
+        <div class="send-section">
+          <h3>📤 Send to Child</h3>
+          <input type="text" id="parent-message" 
+                 placeholder="Type a message to send..." 
+                 class="message-input">
+          <button onclick="sendToChild()" class="send-btn">
+            Send Message →
+          </button>
+        </div>
+      </div>
+      
+      <!-- Right Panel: Child iframe -->
+      <div class="panel child-panel">
+        <h2>📱 Child Window (iframe)</h2>
+        <p class="panel-description">
+          This is the embedded content - like your external course loaded
+          inside the SCORM package.
+        </p>
+        
+        <!-- The iframe -->
+        <div class="iframe-container">
+          <iframe 
+            id="child-frame" 
+            src="child.html" 
+            title="Child Content">
+          </iframe>
+        </div>
+        
+        <!-- Child origin display -->
+        <div class="origin-display">
+          <strong>Child origin:</strong>
+          <code id="child-origin">Loading...</code>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Educational Section -->
+    <section class="education-section">
+      <h2>📖 Understanding postMessage Security</h2>
+      
+      <div class="concept-grid">
+        
+        <div class="concept-card">
+          <h3>🛡️ Origin Validation</h3>
+          <p>
+            The <code>event.origin</code> property tells you exactly where a 
+            message came from. <strong>Always validate this</strong> before 
+            trusting the message content.
+          </p>
+          <pre class="code-example">// ✅ Good - validate origin
+if (event.origin !== 'https://trusted.com') {
+  return; // Ignore untrusted messages
+}
+
+// ❌ Bad - no validation
+window.addEventListener('message', (e) => {
+  doSomethingDangerous(e.data);
+});</pre>
+        </div>
+        
+        <div class="concept-card">
+          <h3>🎯 Target Origin</h3>
+          <p>
+            When SENDING a message, specify who should receive it.
+            Using <code>'*'</code> sends to any window - useful but less secure.
+          </p>
+          <pre class="code-example">// ✅ Good - specific target
+iframe.postMessage(data, 'https://trusted.com');
+
+// ⚠️ Okay for non-sensitive data
+iframe.postMessage(data, '*');
+
+// ❌ Bad - sensitive data with *
+iframe.postMessage(password, '*');</pre>
+        </div>
+        
+        <div class="concept-card">
+          <h3>🤝 Acknowledgment Pattern</h3>
+          <p>
+            postMessage is "fire and forget" - you don't know if it arrived.
+            Send acknowledgments back to confirm receipt.
+          </p>
+          <pre class="code-example">// Sender
+parent.postMessage({cmd: 'complete'}, '*');
+
+// Receiver
+window.addEventListener('message', (e) => {
+  // Process message, then acknowledge
+  e.source.postMessage({
+    type: 'ack',
+    success: true
+  }, e.origin);
+});</pre>
+        </div>
+        
+        <div class="concept-card">
+          <h3>👋 beforeunload Handling</h3>
+          <p>
+            When a window closes, you have limited time to send final data.
+            This is unreliable - don't depend on it for critical operations.
+          </p>
+          <pre class="code-example">window.addEventListener('beforeunload', () => {
+  // Try to send final state
+  // But browser may not wait!
+  parent.postMessage({
+    cmd: 'suspend',
+    data: currentProgress
+  }, '*');
+});</pre>
+        </div>
+        
+      </div>
+    </section>
+    
+  </div>
+  
+  <script>
+    /**
+     * ===========================================================================
+     * PARENT WINDOW POSTMESSAGE HANDLER
+     * ===========================================================================
+     * 
+     * This script demonstrates the RECEIVING side of postMessage communication.
+     * Key responsibilities:
+     *   1. Listen for incoming messages
+     *   2. Validate the message origin (security!)
+     *   3. Process the message content
+     *   4. Send acknowledgment back to sender
+     */
+    
+    /* =========================================================================
+     * CONFIGURATION
+     * ========================================================================= */
+    
+    /**
+     * Get the allowed origins from the textarea.
+     * Returns an array of origins, or ['*'] to allow all.
+     */
+    function getAllowedOrigins() {
+      const textarea = document.getElementById('allowed-origins');
+      const raw = textarea.value.trim();
+      
+      // Handle wildcard
+      if (raw === '*') return ['*'];
+      
+      // Parse multiple origins (one per line)
+      return raw.split('\n')
+        .map(o => o.trim())
+        .filter(o => o.length > 0);
+    }
+    
+    /**
+     * Check if origin validation is enabled.
+     */
+    function isValidationEnabled() {
+      return document.getElementById('validate-origin').checked;
+    }
+    
+    /* =========================================================================
+     * MESSAGE LISTENER
+     * ========================================================================= */
+    
+    /**
+     * MAIN MESSAGE HANDLER
+     * ====================
+     * This is the core of postMessage receiving.
+     * 
+     * The 'message' event fires whenever ANY window sends a postMessage to us.
+     * That's why origin validation is critical - anyone could send us messages!
+     */
+    window.addEventListener('message', function(event) {
+      console.log('📨 Message received!');
+      console.log('  From origin:', event.origin);
+      console.log('  Data:', event.data);
+      console.log('  Source window:', event.source ? 'exists' : 'null');
+      
+      // STEP 1: ORIGIN VALIDATION (if enabled)
+      if (isValidationEnabled()) {
+        const allowed = getAllowedOrigins();
+        
+        // Check if this origin is allowed
+        const isAllowed = allowed.includes('*') || allowed.includes(event.origin);
+        
+        if (!isAllowed) {
+          console.warn('⚠️ Message blocked - untrusted origin:', event.origin);
+          logMessage('parent-log', 'blocked', 
+            `BLOCKED from ${event.origin}`, event.data);
+          return; // Don't process this message!
+        }
+      }
+      
+      // STEP 2: LOG THE MESSAGE (for demo visualization)
+      logMessage('parent-log', 'received', 
+        `From: ${event.origin}`, event.data);
+      
+      // STEP 3: PROCESS THE MESSAGE
+      handleMessage(event);
+      
+      // STEP 4: SEND ACKNOWLEDGMENT
+      sendAcknowledgment(event.source, event.origin, event.data);
+    });
+    
+    /**
+     * HANDLE MESSAGE CONTENT
+     * ======================
+     * Process the actual message data.
+     * In a real app, you'd take action based on the message type/command.
+     */
+    function handleMessage(event) {
+      const data = event.data;
+      
+      // Check message structure
+      if (!data || typeof data !== 'object') {
+        console.log('  Message is not an object, ignoring structure check');
+        return;
+      }
+      
+      // Handle different message types
+      switch (data.type) {
+        case 'greeting':
+          console.log('👋 Received greeting:', data.message);
+          break;
+          
+        case 'complete':
+          console.log('🎉 Received completion signal!');
+          // In SCORM, this would call the LMS API
+          break;
+          
+        case 'ping':
+          console.log('🏓 Received ping!');
+          break;
+          
+        default:
+          console.log('ℹ️ Received message of type:', data.type || 'unknown');
+      }
+    }
+    
+    /**
+     * SEND ACKNOWLEDGMENT
+     * ===================
+     * Let the sender know we received and processed their message.
+     * 
+     * The acknowledgment pattern is important because postMessage is
+     * asynchronous and one-way - the sender doesn't automatically know
+     * if their message was received.
+     * 
+     * @param {Window} targetWindow - The window to send to (event.source)
+     * @param {string} targetOrigin - The origin to send to (event.origin)
+     * @param {*} originalData - The original message (for reference)
+     */
+    function sendAcknowledgment(targetWindow, targetOrigin, originalData) {
+      if (!targetWindow) {
+        console.warn('Cannot send ack - no target window');
+        return;
+      }
+      
+      const ack = {
+        type: 'ack',
+        originalType: originalData?.type || 'unknown',
+        success: true,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log('📤 Sending acknowledgment:', ack);
+      
+      // Send to the specific origin, or '*' if we don't know it
+      const origin = targetOrigin || '*';
+      targetWindow.postMessage(ack, origin);
+      
+      logMessage('parent-log', 'sent', `Ack to: ${origin}`, ack);
+    }
+    
+    /* =========================================================================
+     * SENDING MESSAGES TO CHILD
+     * ========================================================================= */
+    
+    /**
+     * SEND MESSAGE TO CHILD IFRAME
+     * ============================
+     * Demonstrates sending from parent TO child.
+     * In SCORM, this might be used to tell the content to save/suspend.
+     */
+    function sendToChild() {
+      const iframe = document.getElementById('child-frame');
+      const input = document.getElementById('parent-message');
+      const message = input.value.trim();
+      
+      if (!message) {
+        alert('Please enter a message to send');
+        return;
+      }
+      
+      const data = {
+        type: 'fromParent',
+        message: message,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log('📤 Sending to child:', data);
+      
+      // Send to the iframe's content window
+      // Using '*' because we might not know the exact origin
+      iframe.contentWindow.postMessage(data, '*');
+      
+      logMessage('parent-log', 'sent', 'To child iframe', data);
+      input.value = '';
+    }
+    
+    /* =========================================================================
+     * UI UTILITIES
+     * ========================================================================= */
+    
+    /**
+     * LOG MESSAGE TO UI
+     * =================
+     * Adds a visual entry to the message log panel.
+     */
+    function logMessage(logId, direction, label, data) {
+      const log = document.getElementById(logId);
+      
+      // Remove placeholder if it exists
+      const placeholder = log.querySelector('.log-placeholder');
+      if (placeholder) placeholder.remove();
+      
+      // Create log entry
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${direction}`;
+      
+      // Icon based on direction
+      const icons = {
+        received: '📥',
+        sent: '📤',
+        blocked: '🚫'
+      };
+      
+      entry.innerHTML = `
+        <div class="log-header">
+          <span class="log-icon">${icons[direction] || '•'}</span>
+          <span class="log-label">${label}</span>
+          <span class="log-time">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <pre class="log-data">${JSON.stringify(data, null, 2)}</pre>
+      `;
+      
+      // Add to top of log
+      log.insertBefore(entry, log.firstChild);
+      
+      // Keep only last 10 entries
+      while (log.children.length > 10) {
+        log.removeChild(log.lastChild);
+      }
+    }
+    
+    /**
+     * CLEAR LOG
+     */
+    function clearLog(logId) {
+      const log = document.getElementById(logId);
+      log.innerHTML = '<div class="log-placeholder">Log cleared. Messages will appear here...</div>';
+    }
+    
+    /**
+     * UPDATE CHILD ORIGIN DISPLAY
+     * ===========================
+     * Shows the origin of the iframe content.
+     * Note: We can only get this reliably from a postMessage event.origin.
+     */
+    document.getElementById('child-frame').addEventListener('load', function() {
+      // We can't directly access the iframe's location due to same-origin policy
+      // unless it's the same origin as us.
+      try {
+        const childOrigin = this.contentWindow.location.origin;
+        document.getElementById('child-origin').textContent = childOrigin;
+      } catch (e) {
+        // Cross-origin - can't access directly
+        document.getElementById('child-origin').textContent = 
+          'Cross-origin (will be visible in message events)';
+      }
+    });
+    
+    // Allow Enter key to send message
+    document.getElementById('parent-message').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') sendToChild();
+    });
+    
+    console.log('🏠 Parent window loaded and listening for messages');
+  </script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<!--
+==============================================================================
+EXTERNAL CONTENT - Your Actual Course (index.html)
+==============================================================================
+
+THIS LIVES ON YOUR WEB SERVER (e.g., GitHub Pages)
+--------------------------------------------------
+This is a simple example of "external content" - the actual learning material
+that learners interact with. It could be:
+  - A single-page lesson (like this example)
+  - A complex multi-page course
+  - An interactive module built with a tool like Storyline (exported to HTML5)
+  - A video player page
+  - Anything web-based!
+
+KEY POINT:
+This page doesn't know anything about SCORM directly. It just sends a
+postMessage when the learner completes the content, and the SCORM wrapper
+handles all the LMS communication.
+
+THIS SEPARATION IS INTENTIONAL:
+- Content can be updated without re-uploading the SCORM package
+- Same content can be reused in multiple SCORM packages
+- Developers don't need to learn SCORM details
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample Course Content</title>
+  
+  <!-- Link to external CSS for easier maintenance -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!--
+  COURSE CONTENT CONTAINER
+  ========================
+  In a real course, this would contain your actual learning material.
+  For this demo, it's just placeholder content with a complete button.
+  -->
+  <div class="course-container">
+    
+    <!-- Header with course title -->
+    <header class="course-header">
+      <h1>🎓 Sample Course Module</h1>
+      <p class="subtitle">SCORM Light Wrapper Demo - External Content</p>
+    </header>
+    
+    <!-- Main content area -->
+    <main class="course-content">
+      <section class="intro-section">
+        <h2>Welcome to the Demo Course!</h2>
+        <p>
+          This is example content that would be hosted externally (not in the SCORM package).
+          In a real implementation, this could be:
+        </p>
+        <ul>
+          <li>📚 Your existing training content</li>
+          <li>🎥 Video-based lessons</li>
+          <li>🎮 Interactive exercises</li>
+          <li>📝 Assessments and quizzes</li>
+        </ul>
+      </section>
+      
+      <section class="how-it-works">
+        <h2>How This Demo Works</h2>
+        <div class="step-list">
+          <div class="step">
+            <span class="step-number">1</span>
+            <div>
+              <strong>You're viewing this in an iframe</strong>
+              <p>The SCORM wrapper (launch.html) loaded this page inside an iframe.</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <div>
+              <strong>Cross-domain communication</strong>
+              <p>This page and the LMS are on different domains, so we use postMessage.</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-number">3</span>
+            <div>
+              <strong>Click "Mark Complete" below</strong>
+              <p>This sends a postMessage to the parent, which tells the LMS you're done.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 
+      STATUS INDICATOR
+      ================
+      Shows the current connection/completion status.
+      Updates via JavaScript when we get acknowledgments from the parent.
+      -->
+      <section class="status-section">
+        <h2>Status</h2>
+        <div id="status-display" class="status-box status-incomplete">
+          <span class="status-icon">⏳</span>
+          <span id="status-text">Incomplete - Click the button below when ready</span>
+        </div>
+      </section>
+      
+    </main>
+    
+    <!-- 
+    COMPLETION BUTTON
+    =================
+    This is the key interaction - clicking this triggers SCORM completion.
+    -->
+    <footer class="course-footer">
+      <button id="complete-btn" class="complete-button" onclick="markCourseComplete()">
+        ✅ Mark Complete
+      </button>
+      <p class="help-text">Click when you've finished reviewing the content</p>
+    </footer>
+    
+  </div>
+  
+  <!--
+  DEVELOPER INFO (shown at bottom for demo purposes)
+  =================================================
+  In a real course, you probably wouldn't show this to learners.
+  -->
+  <div class="developer-info">
+    <h3>🔧 Technical Info (for developers)</h3>
+    <div id="tech-info">
+      <p><strong>Parent window detected:</strong> <span id="has-parent">Checking...</span></p>
+      <p><strong>Messages sent:</strong> <span id="messages-sent">0</span></p>
+      <p><strong>Acknowledgments received:</strong> <span id="acks-received">0</span></p>
+    </div>
+    <div id="message-log"></div>
+  </div>
+  
+  <!-- Load the SCORM bridge script -->
+  <script src="scorm_bridge.js"></script>
+  
+  <!-- Page-specific initialization -->
+  <script>
+    // Run when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if we're in an iframe
+      const hasParent = window.parent !== window;
+      document.getElementById('has-parent').textContent = 
+        hasParent ? 'Yes (running inside iframe)' : 'No (running standalone)';
+      
+      // If we have a parent, send a ping to test communication
+      if (hasParent) {
+        sendSCORMPing();
+      }
+    });
+    
+    /**
+     * MARK COURSE COMPLETE
+     * ====================
+     * Called when learner clicks the "Mark Complete" button.
+     * Uses the SCORM Bridge to send completion to the parent.
+     */
+    function markCourseComplete() {
+      console.log('🎯 Complete button clicked!');
+      
+      // Disable the button to prevent double-clicks
+      const button = document.getElementById('complete-btn');
+      button.disabled = true;
+      button.textContent = '⏳ Processing...';
+      
+      // Send completion via the SCORM Bridge
+      sendSCORMCompletion();
+    }
+    
+    /**
+     * UPDATE STATUS DISPLAY
+     * =====================
+     * Updates the visual status indicator on the page.
+     * Called from scorm_bridge.js when we get an acknowledgment.
+     */
+    function updateStatusDisplay(isComplete, message) {
+      const statusBox = document.getElementById('status-display');
+      const statusText = document.getElementById('status-text');
+      const button = document.getElementById('complete-btn');
+      
+      if (isComplete) {
+        // Update to completed state
+        statusBox.className = 'status-box status-complete';
+        statusBox.querySelector('.status-icon').textContent = '✅';
+        statusText.textContent = 'Complete! Your progress has been saved.';
+        
+        button.textContent = '✅ Completed!';
+        button.classList.add('completed');
+        // Keep button disabled
+      } else {
+        // Failed state
+        button.disabled = false;
+        button.textContent = '❌ Try Again';
+        statusText.textContent = message || 'Failed to record completion';
+      }
+    }
+    
+    /**
+     * LOG MESSAGE
+     * ===========
+     * Adds a message to the developer info panel (for demo purposes).
+     */
+    function logMessage(direction, text) {
+      const logDiv = document.getElementById('message-log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${direction}`;
+      entry.innerHTML = `<span class="direction">${direction === 'sent' ? '📤' : '📥'}</span> ${text}`;
+      logDiv.appendChild(entry);
+      
+      // Keep only last 5 messages
+      while (logDiv.children.length > 5) {
+        logDiv.removeChild(logDiv.firstChild);
+      }
+    }
+  </script>
+</body>
+</html>

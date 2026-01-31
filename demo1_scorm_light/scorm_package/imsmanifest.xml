@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+==============================================================================
+SCORM 1.2 MANIFEST FILE (imsmanifest.xml)
+==============================================================================
+
+WHAT IS THIS FILE?
+------------------
+This is the "table of contents" for a SCORM package. When an LMS imports a 
+SCORM course, it reads this file to understand:
+  - What the course is called
+  - What files are included
+  - How the course is organized
+  - Which file to launch first
+
+KEY TERMINOLOGY:
+----------------
+• MANIFEST: This entire XML file describing the course
+• ORGANIZATION: The structure/hierarchy of the course (like a table of contents)
+• ITEM: A single launchable unit (like a chapter or lesson)
+• RESOURCE: A file or collection of files that make up an item
+• SCO (Sharable Content Object): Content that communicates with the LMS via JavaScript
+
+SCORM 1.2 vs SCORM 2004:
+------------------------
+We're using SCORM 1.2 because:
+  - It's simpler and has wider LMS support
+  - The API object is called "API" (vs "API_1484_11" in 2004)
+  - Data model elements use "cmi.core." prefix (vs "cmi." in 2004)
+  - It's sufficient for basic completion tracking
+
+IMPORTANT:
+----------
+The file MUST be named exactly "imsmanifest.xml" (lowercase) and MUST be at
+the root of your ZIP file for the LMS to recognize it as a SCORM package.
+-->
+
+<!-- 
+The <manifest> tag is the root element. Key attributes:
+  - identifier: A unique ID for this course (can be anything unique)
+  - version: The version of YOUR course (not SCORM version)
+-->
+<manifest identifier="SCORM_Light_Demo_Course" version="1.0"
+  xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
+  xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd
+                      http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+
+  <!--
+  METADATA SECTION
+  ================
+  Contains information ABOUT the course (like a book's title page).
+  This is optional but recommended for LMS course catalogs.
+  -->
+  <metadata>
+    <!-- Tells the LMS this follows SCORM 1.2 standards -->
+    <schema>ADL SCORM</schema>
+    <schemaversion>1.2</schemaversion>
+  </metadata>
+
+  <!--
+  ORGANIZATIONS SECTION
+  =====================
+  Defines the structure of the course. A course can have multiple organizations
+  (like different "views" of the same content), but typically has just one.
+  
+  The "default" attribute points to which organization to use.
+  -->
+  <organizations default="TOC1">
+    
+    <!-- 
+    Single organization with ID "TOC1" 
+    The <title> appears in the LMS course player's navigation.
+    -->
+    <organization identifier="TOC1">
+      <title>SCORM Light Wrapper Demo</title>
+      
+      <!--
+      ITEM ELEMENT
+      ============
+      Each <item> is a launchable piece of content (like a lesson or module).
+      
+      Attributes:
+        - identifier: Unique ID for this item
+        - identifierref: Points to a <resource> that defines the files to launch
+        - isvisible: Should this appear in the LMS navigation? (default: true)
+      
+      For simple courses, you'll have just one item.
+      Complex courses might have nested items creating a hierarchy.
+      -->
+      <item identifier="ITEM1" identifierref="RESOURCE1" isvisible="true">
+        <title>External Content Demo</title>
+        
+        <!--
+        ADL:MASTERYSCORE (Optional)
+        ===========================
+        If you were tracking scores, this sets the passing threshold.
+        We're not using scores in this demo, but including for reference.
+        
+        <adlcp:masteryscore>80</adlcp:masteryscore>
+        -->
+      </item>
+      
+    </organization>
+  </organizations>
+
+  <!--
+  RESOURCES SECTION
+  =================
+  Lists all files in the package and groups them into resources.
+  Each <resource> is like a "package within the package."
+  
+  Key attributes:
+    - identifier: Unique ID (referenced by <item identifierref>)
+    - type: Always "webcontent" for SCORM
+    - adlcp:scormtype: "sco" means it communicates with LMS, "asset" means static content
+    - href: The file to launch (relative to manifest location)
+  -->
+  <resources>
+    
+    <!--
+    Our main (and only) resource.
+    
+    scormtype="sco" is CRITICAL - it tells the LMS that this content will:
+      - Call LMSInitialize() when it starts
+      - Call LMSSetValue() to report progress
+      - Call LMSFinish() when done
+    
+    If you used "asset" instead, the LMS wouldn't expect API calls.
+    -->
+    <resource identifier="RESOURCE1" type="webcontent" adlcp:scormtype="sco" href="launch.html">
+      
+      <!--
+      FILE ELEMENTS
+      =============
+      List every file that's part of this resource.
+      This helps the LMS know what files belong to the course.
+      
+      For our minimal demo, we only have two files.
+      A real course might list dozens of HTML, CSS, JS, and image files.
+      -->
+      <file href="launch.html"/>
+      <file href="scorm_api_proxy.js"/>
+      
+      <!--
+      Note: We DON'T list the external content files here because
+      they're hosted separately (on GitHub Pages), not in this package.
+      -->
+      
+    </resource>
+    
+  </resources>
+
+</manifest>
+
+<!--
+COMMON ISSUES & DEBUGGING TIPS:
+===============================
+
+1. "Course won't import"
+   - Check that imsmanifest.xml is at the ROOT of the ZIP (not in a subfolder)
+   - Validate XML syntax (use an online XML validator)
+   - Ensure identifier values are unique
+
+2. "Course imports but won't launch"
+   - Check that the href in <resource> points to an existing file
+   - Verify the file has the correct SCORM API calls
+
+3. "Course launches but doesn't track"
+   - Ensure scormtype="sco" (not "asset")
+   - Verify your JavaScript is calling the API correctly
+
+4. "LMS shows wrong title"
+   - Update the <title> elements in this manifest
+   - Some LMS systems cache - try re-importing
+
+TESTING TOOLS:
+==============
+- ScormCloud (cloud.scorm.com) - Free tier available, great for testing
+- SCORM Test Track - Validates your package structure
+- Browser Developer Tools - Check console for JavaScript errors
+-->

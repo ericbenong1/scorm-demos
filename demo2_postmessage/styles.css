@@ -1,0 +1,395 @@
+/**
+ * ==============================================================================
+ * POSTMESSAGE DEMO STYLES (styles.css)
+ * ==============================================================================
+ * 
+ * Styles for the parent.html demonstration page.
+ * Focused on clarity and educational presentation.
+ */
+
+/* ===========================================================================
+ * RESET & BASE
+ * =========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+               Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  background: #f0f4f8;
+}
+
+/* ===========================================================================
+ * MAIN CONTAINER
+ * =========================================================================== */
+
+.demo-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.demo-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.demo-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 2rem;
+  color: #1a365d;
+}
+
+.demo-header p {
+  margin: 0;
+  color: #4a5568;
+  font-size: 1.1rem;
+}
+
+/* ===========================================================================
+ * TWO-COLUMN LAYOUT
+ * =========================================================================== */
+
+.demo-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 900px) {
+  .demo-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===========================================================================
+ * PANELS
+ * =========================================================================== */
+
+.panel {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.panel h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.3rem;
+  color: #2d3748;
+}
+
+.panel-description {
+  margin: 0 0 20px 0;
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.parent-panel {
+  border-top: 4px solid #4c51bf;
+}
+
+.child-panel {
+  border-top: 4px solid #38a169;
+}
+
+/* ===========================================================================
+ * CONFIGURATION SECTION
+ * =========================================================================== */
+
+.config-section {
+  margin-bottom: 25px;
+  padding: 15px;
+  background: #f7fafc;
+  border-radius: 8px;
+}
+
+.config-section h3 {
+  margin: 0 0 15px 0;
+  font-size: 1rem;
+  color: #4a5568;
+}
+
+.config-item {
+  margin-bottom: 15px;
+}
+
+.config-item:last-child {
+  margin-bottom: 0;
+}
+
+.config-item label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.config-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.config-description {
+  margin: 5px 0 0 0;
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.config-description em {
+  color: #e53e3e;
+}
+
+.config-textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-family: Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  resize: vertical;
+}
+
+/* ===========================================================================
+ * MESSAGE LOG
+ * =========================================================================== */
+
+.log-section {
+  margin-bottom: 25px;
+}
+
+.log-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  color: #4a5568;
+}
+
+.message-log {
+  background: #1a202c;
+  border-radius: 8px;
+  padding: 15px;
+  min-height: 150px;
+  max-height: 250px;
+  overflow-y: auto;
+  font-family: Monaco, Consolas, monospace;
+  font-size: 0.8rem;
+}
+
+.log-placeholder {
+  color: #718096;
+  font-style: italic;
+}
+
+.log-entry {
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.log-received {
+  border-left: 3px solid #48bb78;
+}
+
+.log-sent {
+  border-left: 3px solid #4299e1;
+}
+
+.log-blocked {
+  border-left: 3px solid #f56565;
+  background: rgba(245, 101, 101, 0.1);
+}
+
+.log-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.log-icon {
+  font-size: 1rem;
+}
+
+.log-label {
+  color: #a0aec0;
+  flex: 1;
+}
+
+.log-time {
+  color: #718096;
+  font-size: 0.75rem;
+}
+
+.log-data {
+  margin: 0;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  color: #e2e8f0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 0.75rem;
+}
+
+.clear-btn {
+  margin-top: 10px;
+  padding: 6px 12px;
+  background: #4a5568;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.clear-btn:hover {
+  background: #2d3748;
+}
+
+/* ===========================================================================
+ * SEND SECTION
+ * =========================================================================== */
+
+.send-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  color: #4a5568;
+}
+
+.message-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+
+.message-input:focus {
+  outline: none;
+  border-color: #4c51bf;
+  box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.1);
+}
+
+.send-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #4c51bf 0%, #6b46c1 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.send-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 81, 191, 0.3);
+}
+
+/* ===========================================================================
+ * IFRAME CONTAINER
+ * =========================================================================== */
+
+.iframe-container {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f7fafc;
+}
+
+.iframe-container iframe {
+  width: 100%;
+  height: 450px;
+  border: none;
+  display: block;
+}
+
+.origin-display {
+  margin-top: 15px;
+  padding: 10px;
+  background: #f7fafc;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.origin-display code {
+  background: #edf2f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: Monaco, Consolas, monospace;
+}
+
+/* ===========================================================================
+ * EDUCATION SECTION
+ * =========================================================================== */
+
+.education-section {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.education-section h2 {
+  margin: 0 0 25px 0;
+  text-align: center;
+  color: #2d3748;
+}
+
+.concept-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.concept-card {
+  background: #f7fafc;
+  border-radius: 8px;
+  padding: 20px;
+  border-left: 4px solid #4c51bf;
+}
+
+.concept-card h3 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  color: #2d3748;
+}
+
+.concept-card p {
+  margin: 0 0 15px 0;
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.concept-card code {
+  background: #edf2f7;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: Monaco, Consolas, monospace;
+  font-size: 0.85em;
+}
+
+.code-example {
+  margin: 0;
+  padding: 12px;
+  background: #1a202c;
+  color: #e2e8f0;
+  border-radius: 6px;
+  font-family: Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre;
+}
