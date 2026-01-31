@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS Launch Simulator - Token Security Demo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔐 LMS Launch Simulator</h1>
+            <p class="subtitle">Token Security Demo - SCORM Light Proposal</p>
+        </header>
+
+        <div class="demo-card">
+            <div class="card-header">
+                <h2>Simulated LMS Launch Page</h2>
+            </div>
+            <div class="card-body">
+                <p class="info-text">
+                    This page simulates what happens when a user clicks "Launch" in an LMS.
+                    The LMS would generate a secure token server-side and redirect to the content.
+                </p>
+
+                <div class="form-group">
+                    <label for="userId">User ID:</label>
+                    <input type="text" id="userId" value="user_12345" placeholder="Enter user ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="courseId">Course ID:</label>
+                    <input type="text" id="courseId" value="course_scorm_light_101" placeholder="Enter course ID">
+                </div>
+
+                <button id="launchBtn" class="btn btn-primary btn-large">
+                    🚀 Launch Content
+                </button>
+
+                <div id="tokenInfo" class="token-info" style="display: none;">
+                    <h3>Generated Token:</h3>
+                    <div class="token-display">
+                        <code id="tokenDisplay"></code>
+                    </div>
+                    <p class="note">Token expires in: <strong id="tokenExpiry"></strong></p>
+                    <p class="note">Redirecting to content...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="education-section">
+            <h3>📚 Understanding Token-Based Launch Security</h3>
+            
+            <div class="concept-box">
+                <h4>🔒 Why Token Security?</h4>
+                <p>
+                    Token-based security prevents unauthorized access to SCORM content by:
+                </p>
+                <ul>
+                    <li><strong>User Binding:</strong> Token is tied to specific user and course</li>
+                    <li><strong>Time Limited:</strong> Token expires after short period (5 minutes in this demo)</li>
+                    <li><strong>Signature Verification:</strong> Content validates token wasn't tampered with</li>
+                    <li><strong>Session Binding:</strong> Token linked to active LMS session</li>
+                </ul>
+            </div>
+
+            <div class="concept-box warning-box">
+                <h4>⚠️ Important: JavaScript Simulation</h4>
+                <p>
+                    <strong>This demo uses JavaScript for proof-of-concept only!</strong>
+                </p>
+                <p>
+                    In production, token generation MUST happen <strong>server-side (PHP/Node.js/Python)</strong> because:
+                </p>
+                <ul>
+                    <li>Secret keys must never be exposed in client-side JavaScript</li>
+                    <li>Server validates user authentication and course enrollment from database</li>
+                    <li>Server-side prevents token forgery and replay attacks</li>
+                    <li>Token hashes stored in database for additional verification</li>
+                </ul>
+            </div>
+
+            <div class="concept-box">
+                <h4>🔧 Production Implementation (PHP Example)</h4>
+                <pre><code>// lms_launch.php
+$user_id = $_SESSION['user_id'];
+$course_id = $_GET['course_id'];
+
+// Verify user is enrolled
+if (!$db->isUserEnrolled($user_id, $course_id)) {
+    die('Access denied');
+}
+
+// Generate secure token
+$token = generateSecureToken($user_id, $course_id);
+
+// Store token hash in database
+$db->storeTokenHash(hash('sha256', $token));
+
+// Redirect to content with token
+header("Location: content.html?token=$token");</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="token-utils.js"></script>
+    <script>
+        document.getElementById('launchBtn').addEventListener('click', async () => {
+            const userId = document.getElementById('userId').value.trim();
+            const courseId = document.getElementById('courseId').value.trim();
+            
+            if (!userId || !courseId) {
+                alert('Please enter both User ID and Course ID');
+                return;
+            }
+            
+            // Disable button during generation
+            const btn = document.getElementById('launchBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Generating token...';
+            
+            try {
+                // Generate token (simulates server-side generation)
+                const token = await TokenSecurity.generateToken(userId, courseId);
+                
+                // Display token info
+                document.getElementById('tokenDisplay').textContent = token;
+                document.getElementById('tokenExpiry').textContent = 
+                    TokenSecurity.formatTimeRemaining(TokenSecurity.getTokenExpirationTime());
+                document.getElementById('tokenInfo').style.display = 'block';
+                
+                // Redirect to content with token
+                setTimeout(() => {
+                    window.location.href = `content.html?token=${encodeURIComponent(token)}`;
+                }, 2000);
+                
+            } catch (error) {
+                alert('Error generating token: ' + error.message);
+                btn.disabled = false;
+                btn.textContent = '🚀 Launch Content';
+            }
+        });
+    </script>
+</body>
+</html>

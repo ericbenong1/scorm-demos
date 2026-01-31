@@ -341,17 +341,393 @@ This demo directly supports the following project needs:
 
 ---
 
-## Demo 3: [Optional - Future Work]
+## Demo 3: Token Security Demo
 
-**Status:** Optional
+### What It Demonstrates
 
-Based on client feedback and project requirements, Demo 3 could potentially demonstrate:
-- Advanced SCORM tracking elements (scores, time, objectives, interactions)
-- Integration with specific LMS platforms or custom requirements
-- Additional security features or compliance requirements
-- Performance optimization for high-volume content
+Demo 3 showcases **secure token-based launch architecture** for SCORM Light implementations. This demo simulates how an LMS would generate time-limited, signed tokens to prevent unauthorized access to course content while maintaining a seamless user experience.
 
-*This demo is not currently planned but can be developed if specific validation needs arise during the proposal evaluation or project kickoff phase.*
+**Key Capabilities Proven:**
+- ✅ Token generation with user/course binding
+- ✅ Time-limited token expiration (5 minutes demo, configurable)
+- ✅ HMAC-like signature verification (simulated)
+- ✅ Token validation before content access
+- ✅ Secure rejection of invalid/expired tokens
+- ✅ User-friendly error handling and messaging
+- ✅ Professional UX with real-time token status
+
+**Security Concepts Demonstrated:**
+- **User Binding:** Tokens tied to specific user_id and course_id
+- **Time Limitation:** Tokens expire to prevent replay attacks
+- **Signature Verification:** Detects token tampering
+- **Session Binding:** Tokens linked to session identifiers
+- **Access Control:** Content inaccessible without valid token
+
+### Technical Architecture
+
+This demo implements a three-page flow that simulates the complete token lifecycle from generation through validation to rejection:
+
+**Page 1: LMS Launch Simulator (`launcher.html`)**
+- Simulates the LMS "Launch" button action
+- Accepts user_id and course_id inputs
+- Generates secure token with payload and signature
+- Displays token structure for educational purposes
+- Redirects to content page with token parameter
+
+**Page 2: Protected Content (`content.html`)**
+- Validates token before displaying content
+- Checks signature integrity
+- Verifies token hasn't expired
+- Displays user/course information from token
+- Shows real-time countdown of token expiration
+- Implements color-coded warnings (green → yellow → red)
+
+**Page 3: Access Denied (`rejected.html`)**
+- Displayed when token validation fails
+- Shows specific error reason (expired, invalid, missing, tampered)
+- Provides user-friendly explanations
+- Offers troubleshooting guidance
+- Includes technical details panel for debugging
+
+**Supporting Files:**
+- **`token-utils.js`** - Core token generation and validation library
+- **`styles.css`** - Professional, accessible styling across all pages
+- **`README.md`** - Comprehensive documentation with production guidelines
+
+**Token Structure:**
+```json
+{
+  "payload": {
+    "user_id": "user_12345",
+    "course_id": "course_scorm_light_101",
+    "issued_at": 1738368000000,
+    "expires_at": 1738368300000,
+    "session_id": "sess_abc123xyz_1738368000000"
+  },
+  "signature": "a7f3c9e1b2d4f6a8c5e7d9f1b3a5c7e9..."
+}
+```
+
+**Validation Process:**
+1. **Extract Token:** Retrieve from URL parameter
+2. **Decode:** Parse base64-encoded token
+3. **Verify Signature:** Recalculate and compare signatures
+4. **Check Expiration:** Validate current time < expires_at
+5. **Validate Structure:** Ensure all required fields present
+6. **Grant/Deny Access:** Display content or redirect to error
+
+### How to Test It
+
+**Local Testing (Recommended):**
+
+1. **Open the Demo:**
+   - Navigate to `demo3_token_security/launcher.html`
+   - Open in any modern web browser
+
+2. **Test Valid Token Flow:**
+   - Enter User ID (or use default: `user_12345`)
+   - Enter Course ID (or use default: `course_scorm_light_101`)
+   - Click "🚀 Launch Content" button
+   - Observe token generation (2-second delay for visibility)
+   - Automatically redirected to content page
+   - View validated user information and token details
+   - Watch real-time countdown of token expiration
+
+3. **Test Token Expiration:**
+   - **Option A:** Click "🧪 Test Expired Token" button on content page
+   - **Option B:** Wait 5 minutes and see automatic expiration
+   - Observe redirect to rejection page with expiration message
+
+4. **Test Invalid Token:**
+   - Access `content.html` with manually modified token in URL
+   - Example: `content.html?token=invalid_token_xyz`
+   - Observe "Invalid signature" error on rejection page
+
+5. **Test Missing Token:**
+   - Access `content.html` directly without token parameter
+   - Observe "Token missing" error on rejection page
+
+**GitHub Pages Testing (After Deployment):**
+- Demo will be available at: `https://[username].github.io/scorm-demos/demo3_token_security/launcher.html`
+- All functionality works client-side (no server required)
+
+**Expected Behaviors:**
+
+| Test Scenario | Expected Result |
+|--------------|----------------|
+| Valid token within 5 minutes | Content displays with user info |
+| Token expires naturally | Auto-redirect to rejection page |
+| Click "Test Expired" button | Immediate redirect to rejection page |
+| Manually modify token | "Invalid signature" error |
+| Access content without token | "Token missing" error |
+| Real-time countdown | Time changes color: green → yellow → red |
+
+### ⚠️ Important: JavaScript Simulation
+
+**This demo uses JavaScript for proof-of-concept only!**
+
+This is explicitly a **conceptual demonstration** to show understanding of token-based security for the proposal. The implementation simulates what would happen server-side in production.
+
+**Why JavaScript for the Demo:**
+- GitHub Pages doesn't support server-side languages (PHP/Node.js/Python)
+- Demonstrates the complete token lifecycle visually
+- Shows the security concepts end-to-end
+- Appropriate for proposal validation purposes
+- Allows interactive testing without server infrastructure
+
+**Production Implementation Requirements:**
+
+In a **real SCORM Light implementation**, token operations MUST be server-side:
+
+#### ❌ Never Do This in Production:
+```javascript
+// INSECURE - Secret key exposed to client
+const SECRET_KEY = 'my_secret_key_12345';
+const token = generateToken(userId, SECRET_KEY);
+```
+
+#### ✅ Production Implementation (PHP Example):
+```php
+// lms_launch.php (Server-Side Token Generation)
+session_start();
+
+// Verify user authentication
+if (!isset($_SESSION['user_id'])) {
+    die('Not authenticated');
+}
+
+$user_id = $_SESSION['user_id'];
+$course_id = $_GET['course_id'];
+
+// Check database for enrollment
+$db = new Database();
+if (!$db->isUserEnrolled($user_id, $course_id)) {
+    die('User not enrolled in course');
+}
+
+// Generate secure token
+$secret_key = getenv('TOKEN_SECRET_KEY'); // From environment
+$issued_at = time();
+$expires_at = $issued_at + (5 * 60); // 5 minutes
+
+$payload = json_encode([
+    'user_id' => $user_id,
+    'course_id' => $course_id,
+    'issued_at' => $issued_at,
+    'expires_at' => $expires_at,
+    'session_id' => session_id()
+]);
+
+// Sign with HMAC-SHA256
+$signature = hash_hmac('sha256', $payload, $secret_key);
+$token = base64_encode(json_encode([
+    'payload' => json_decode($payload, true),
+    'signature' => $signature
+]));
+
+// Store token hash in database
+$token_hash = hash('sha256', $token);
+$db->storeToken($token_hash, $user_id, $expires_at);
+
+// Redirect to content
+header("Location: content.php?token=" . urlencode($token));
+exit;
+```
+
+```php
+// content.php (Server-Side Token Validation)
+$token = $_GET['token'] ?? '';
+
+// Validate token
+$token_data = json_decode(base64_decode($token), true);
+$payload = $token_data['payload'];
+$signature = $token_data['signature'];
+
+// Verify signature
+$secret_key = getenv('TOKEN_SECRET_KEY');
+$expected_sig = hash_hmac('sha256', json_encode($payload), $secret_key);
+
+if (!hash_equals($expected_sig, $signature)) {
+    header('Location: rejected.php?reason=invalid_signature');
+    exit;
+}
+
+// Check expiration
+if (time() > $payload['expires_at']) {
+    header('Location: rejected.php?reason=expired');
+    exit;
+}
+
+// Verify token in database
+$db = new Database();
+if (!$db->tokenExists(hash('sha256', $token))) {
+    header('Location: rejected.php?reason=not_found');
+    exit;
+}
+
+// Check session binding
+session_start();
+if (session_id() !== $payload['session_id']) {
+    header('Location: rejected.php?reason=session_mismatch');
+    exit;
+}
+
+// All checks passed - load content
+include 'scorm_content.php';
+```
+
+### What It Proves
+
+This demonstration validates our understanding of critical security architecture for SCORM implementations:
+
+**Security Architecture Competency:**
+1. **Token-Based Authentication** - Prevents unauthorized direct access to content
+2. **Time-Limited Sessions** - Protects against link sharing and replay attacks
+3. **Cryptographic Signing** - Detects token tampering and forgery attempts
+4. **Session Binding** - Links tokens to active user sessions
+5. **Graceful Error Handling** - User-friendly messaging for security failures
+
+**Production Readiness Awareness:**
+- Clear documentation that JavaScript simulation is for demo only
+- Comprehensive production implementation guidelines included
+- Demonstrates understanding of client vs. server security boundaries
+- Shows awareness of common security pitfalls and how to avoid them
+
+**User Experience Design:**
+- Clean, professional interface across all pages
+- Real-time feedback on token status
+- Color-coded warnings for approaching expiration
+- Helpful error messages guide users to proper launch procedure
+- Mobile-responsive design
+
+### Educational Value
+
+This demo serves multiple purposes:
+
+**1. Security Awareness Training**
+- Shows WHY token security is necessary (prevents URL sharing)
+- Demonstrates HOW tokens work (generation → validation → expiration)
+- Explains WHEN tokens should be used (every content launch)
+
+**2. Technical Architecture Demonstration**
+- Illustrates complete token lifecycle
+- Shows integration points with LMS
+- Demonstrates error handling patterns
+
+**3. Implementation Guidance**
+- README.md includes production PHP examples
+- Clear separation of demo vs. production requirements
+- Best practices for token management
+
+**4. Client Confidence Building**
+- Proves deep understanding of security principles
+- Shows commitment to production-quality security
+- Demonstrates ability to communicate technical concepts clearly
+
+### Relation to Client Requirements
+
+This demo addresses critical security concerns for the SCORM Light implementation:
+
+**1. Unauthorized Access Prevention**
+- Users cannot share direct links to bypass LMS authentication
+- Content requires valid token from LMS launch
+- Expired tokens automatically rejected
+
+**2. Session Security**
+- Tokens bound to user sessions prevent hijacking
+- Time limits reduce window of vulnerability
+- Signature verification prevents token forgery
+
+**3. Audit and Compliance**
+- Token validation creates security audit trail
+- Failed access attempts can be logged
+- User/course binding enables tracking
+
+**4. Production Scalability**
+- Token pattern scales to thousands of concurrent users
+- Stateless validation (signature check) reduces server load
+- Database token storage enables additional verification layers
+
+**Integration with Demo 1 (SCORM Light Wrapper):**
+
+In the complete implementation, token security integrates with the SCORM wrapper:
+
+```
+┌──────────────────┐
+│  LMS (PHP)       │
+│  1. Authenticate │
+│  2. Generate     │
+│     Token        │
+└────────┬─────────┘
+         │
+         ↓ Redirect with token
+┌──────────────────────┐
+│  launch.html         │  ← SCORM Package
+│  (with token param)  │
+│  3. Validate token   │
+│  4. If valid, load   │
+│     external iframe  │
+└────────┬─────────────┘
+         │
+         ↓ Load if token valid
+┌──────────────────────┐
+│  External Content    │
+│  (GitHub Pages/CDN)  │
+└──────────────────────┘
+```
+
+**Security Flow:**
+1. User clicks "Launch" in LMS
+2. LMS generates token (server-side PHP)
+3. LMS redirects to SCORM package with token
+4. SCORM package validates token (server-side PHP)
+5. If valid, SCORM package loads external content in iframe
+6. If invalid, redirects to rejection page
+7. Token expires after set time (5-15 minutes)
+
+**Additional Security Layers (Production):**
+- Database token storage and verification
+- Rate limiting on token generation
+- IP address binding (optional)
+- Device fingerprinting (optional)
+- Logging and monitoring of failed attempts
+- Automatic token revocation on logout
+
+### Testing Checklist
+
+Use this checklist to verify all demo functionality:
+
+- [ ] **Valid token flow works**
+  - [ ] Token generates successfully
+  - [ ] Content displays after validation
+  - [ ] User information shows correctly
+  - [ ] Token expiration countdown displays
+
+- [ ] **Expiration handling works**
+  - [ ] "Test Expired Token" button redirects properly
+  - [ ] Natural expiration after 5 minutes works
+  - [ ] Expiration error message is clear
+
+- [ ] **Invalid token handling works**
+  - [ ] Modified token shows "Invalid signature" error
+  - [ ] Corrupted token shows appropriate error
+  - [ ] Error page displays helpful information
+
+- [ ] **Missing token handling works**
+  - [ ] Direct content access without token redirects
+  - [ ] Error message guides user to launcher
+
+- [ ] **UI/UX quality**
+  - [ ] All pages styled consistently
+  - [ ] Mobile responsive design works
+  - [ ] Color coding (green/yellow/red) works
+  - [ ] Buttons and forms function properly
+
+- [ ] **Educational content**
+  - [ ] Production notes clearly explain server-side requirement
+  - [ ] PHP examples are present and accurate
+  - [ ] Security warnings are prominent
+  - [ ] README.md is comprehensive
 
 ---
 

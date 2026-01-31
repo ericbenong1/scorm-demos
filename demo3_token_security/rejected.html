@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Denied - Token Security Demo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header error-header">
+            <h1>🚫 Access Denied</h1>
+            <p class="subtitle">Token Validation Failed</p>
+        </header>
+
+        <div class="demo-card error-card">
+            <div class="card-header error-card-header">
+                <h2>❌ Unable to Access Content</h2>
+            </div>
+            <div class="card-body">
+                <div class="error-info">
+                    <h3>Error Reason:</h3>
+                    <div class="error-reason" id="errorReason">
+                        Loading error details...
+                    </div>
+                    
+                    <h3>Details:</h3>
+                    <div class="error-details" id="errorDetails">
+                        Loading error details...
+                    </div>
+                </div>
+
+                <div class="common-causes">
+                    <h3>Common Causes:</h3>
+                    <ul>
+                        <li><strong>Token Expired:</strong> The launch token has exceeded its validity period (typically 5 minutes)</li>
+                        <li><strong>Invalid Token:</strong> The token was tampered with or corrupted</li>
+                        <li><strong>No Token:</strong> Content was accessed directly without proper LMS launch</li>
+                        <li><strong>Session Mismatch:</strong> Token doesn't match your current LMS session</li>
+                    </ul>
+                </div>
+
+                <div class="action-buttons">
+                    <button onclick="window.location.href='launcher.html'" class="btn btn-primary">
+                        🚀 Launch Content Again
+                    </button>
+                    <button onclick="showTechnicalDetails()" class="btn btn-secondary">
+                        🔍 Show Technical Details
+                    </button>
+                </div>
+
+                <div id="technicalDetails" class="technical-details" style="display: none;">
+                    <h4>Technical Information:</h4>
+                    <table>
+                        <tr>
+                            <td><strong>Timestamp:</strong></td>
+                            <td id="timestamp"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>User Agent:</strong></td>
+                            <td id="userAgent"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Referrer:</strong></td>
+                            <td id="referrer"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="education-section">
+            <h3>🔐 Why This Security Measure?</h3>
+            
+            <div class="concept-box">
+                <h4>Understanding Token Expiration</h4>
+                <p>
+                    Tokens expire quickly (5 minutes in this demo) to prevent:
+                </p>
+                <ul>
+                    <li><strong>Unauthorized Sharing:</strong> Users can't share direct links to bypass LMS authentication</li>
+                    <li><strong>Replay Attacks:</strong> Old tokens can't be reused after session ends</li>
+                    <li><strong>Session Hijacking:</strong> Stolen tokens become useless quickly</li>
+                    <li><strong>Resource Control:</strong> Ensures users access content through proper channels</li>
+                </ul>
+            </div>
+
+            <div class="concept-box">
+                <h4>What Should Users Do?</h4>
+                <p>
+                    <strong>Simple Solution:</strong> Always launch SCORM content from within your LMS, not from bookmarks or shared links.
+                </p>
+                <p>
+                    The LMS will generate a fresh, valid token each time you click "Launch" on the course.
+                </p>
+            </div>
+
+            <div class="concept-box warning-box">
+                <h4>⚠️ Production Error Handling</h4>
+                <p>
+                    In a real implementation, this error page would also:
+                </p>
+                <ul>
+                    <li>Log the failed access attempt for security monitoring</li>
+                    <li>Check if user has valid LMS session and offer automatic re-launch</li>
+                    <li>Provide contact information for technical support</li>
+                    <li>Display user-friendly messages based on error type</li>
+                    <li>Track repeated failures for potential security threats</li>
+                </ul>
+                <pre><code>// Production PHP error handling
+if ($validation_error) {
+    // Log security event
+    $logger->logSecurityEvent([
+        'type' => 'token_validation_failed',
+        'reason' => $error_reason,
+        'ip' => $_SERVER['REMOTE_ADDR'],
+        'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+        'timestamp' => time()
+    ]);
+    
+    // Check if user has active LMS session
+    if (isset($_SESSION['user_id'])) {
+        // Offer to generate new token and retry
+        $show_relaunch_button = true;
+    }
+    
+    // Display appropriate error page
+    include 'error_template.php';
+}</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load error details from URL parameters
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const reason = urlParams.get('reason') || 'Unknown error';
+            const details = urlParams.get('details') || 'No additional details available.';
+            
+            // Display error information
+            document.getElementById('errorReason').textContent = reason;
+            document.getElementById('errorDetails').textContent = details;
+            
+            // Display technical details
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+            document.getElementById('userAgent').textContent = navigator.userAgent;
+            document.getElementById('referrer').textContent = document.referrer || 'Direct access';
+        });
+        
+        function showTechnicalDetails() {
+            const details = document.getElementById('technicalDetails');
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protected Content - Token Security Demo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h2>🔐 Validating Token...</h2>
+            <p>Verifying secure access credentials</p>
+        </div>
+    </div>
+
+    <div id="contentArea" class="container" style="display: none;">
+        <header class="header">
+            <h1>✅ Protected Content</h1>
+            <p class="subtitle">Access Granted - Token Validated Successfully</p>
+        </header>
+
+        <div class="demo-card success-card">
+            <div class="card-header">
+                <h2>🎉 Welcome to the Secure Content</h2>
+            </div>
+            <div class="card-body">
+                <p class="info-text">
+                    <strong>Congratulations!</strong> Your token has been validated and you have been granted access to this protected content.
+                </p>
+                
+                <div class="user-info">
+                    <h3>Session Information:</h3>
+                    <table>
+                        <tr>
+                            <td><strong>User ID:</strong></td>
+                            <td id="userIdDisplay"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Course ID:</strong></td>
+                            <td id="courseIdDisplay"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Session ID:</strong></td>
+                            <td id="sessionIdDisplay"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Token Issued:</strong></td>
+                            <td id="issuedAtDisplay"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Token Expires:</strong></td>
+                            <td id="expiresAtDisplay"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Time Remaining:</strong></td>
+                            <td id="timeRemainingDisplay" class="time-remaining"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="content-section">
+                    <h3>📖 Your Learning Content</h3>
+                    <p>
+                        This is where your actual course content would be displayed. In the SCORM Light implementation:
+                    </p>
+                    <ul>
+                        <li>External content loads in an iframe</li>
+                        <li>Token validation happens before iframe loads</li>
+                        <li>Content cannot be accessed without valid token</li>
+                        <li>Token expires after set time period</li>
+                    </ul>
+                </div>
+
+                <div class="action-buttons">
+                    <button onclick="window.location.href='launcher.html'" class="btn btn-secondary">
+                        ← Back to Launcher
+                    </button>
+                    <button onclick="testExpiredToken()" class="btn btn-warning">
+                        🧪 Test Expired Token
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="education-section">
+            <h3>🔍 What Just Happened?</h3>
+            
+            <div class="concept-box">
+                <h4>Token Validation Process</h4>
+                <ol class="process-list">
+                    <li>
+                        <strong>Token Extraction:</strong> Retrieved token from URL parameter
+                    </li>
+                    <li>
+                        <strong>Token Decoding:</strong> Decoded base64-encoded token
+                    </li>
+                    <li>
+                        <strong>Signature Verification:</strong> Verified token signature matches expected value
+                    </li>
+                    <li>
+                        <strong>Expiration Check:</strong> Confirmed token is not expired
+                    </li>
+                    <li>
+                        <strong>Payload Extraction:</strong> Retrieved user and course information
+                    </li>
+                    <li>
+                        <strong>Access Granted:</strong> Displayed protected content
+                    </li>
+                </ol>
+            </div>
+
+            <div class="concept-box warning-box">
+                <h4>⚠️ Production Implementation Notes</h4>
+                <p>
+                    In a real SCORM Light implementation with PHP:
+                </p>
+                <pre><code>// content.php
+$token = $_GET['token'] ?? '';
+
+// Validate token server-side
+$validation = validateToken($token);
+
+if (!$validation['valid']) {
+    // Redirect to error page
+    header('Location: rejected.php?reason=' . urlencode($validation['reason']));
+    exit;
+}
+
+// Token is valid - extract user info
+$user_id = $validation['payload']['user_id'];
+$course_id = $validation['payload']['course_id'];
+
+// Verify token hash exists in database
+if (!$db->tokenHashExists(hash('sha256', $token))) {
+    die('Invalid token - not found in database');
+}
+
+// Load content for validated user
+include 'scorm_content.html';</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="token-utils.js"></script>
+    <script>
+        let timeRemainingInterval;
+        
+        async function validateAndLoadContent() {
+            // Get token from URL
+            const token = TokenSecurity.getTokenFromURL();
+            
+            if (!token) {
+                // No token provided - redirect to rejection page
+                window.location.href = 'rejected.html?reason=missing';
+                return;
+            }
+            
+            // Simulate validation delay (like server processing)
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Validate token
+            const validation = await TokenSecurity.validateToken(token);
+            
+            if (!validation.valid) {
+                // Invalid token - redirect to rejection page
+                const params = new URLSearchParams({
+                    reason: validation.reason,
+                    details: validation.details
+                });
+                window.location.href = `rejected.html?${params.toString()}`;
+                return;
+            }
+            
+            // Token is valid - display content
+            displayContent(validation);
+        }
+        
+        function displayContent(validation) {
+            const { payload, time_remaining } = validation;
+            
+            // Hide loading screen, show content
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('contentArea').style.display = 'block';
+            
+            // Display user information
+            document.getElementById('userIdDisplay').textContent = payload.user_id;
+            document.getElementById('courseIdDisplay').textContent = payload.course_id;
+            document.getElementById('sessionIdDisplay').textContent = payload.session_id;
+            document.getElementById('issuedAtDisplay').textContent = 
+                new Date(payload.issued_at).toLocaleString();
+            document.getElementById('expiresAtDisplay').textContent = 
+                new Date(payload.expires_at).toLocaleString();
+            
+            // Update time remaining
+            updateTimeRemaining(time_remaining);
+            
+            // Update time remaining every second
+            timeRemainingInterval = setInterval(() => {
+                const now = Date.now();
+                const remaining = payload.expires_at - now;
+                
+                if (remaining <= 0) {
+                    clearInterval(timeRemainingInterval);
+                    handleTokenExpired();
+                } else {
+                    updateTimeRemaining(remaining);
+                }
+            }, 1000);
+        }
+        
+        function updateTimeRemaining(milliseconds) {
+            const formatted = TokenSecurity.formatTimeRemaining(milliseconds);
+            const display = document.getElementById('timeRemainingDisplay');
+            display.textContent = formatted;
+            
+            // Color code based on time remaining
+            if (milliseconds < 60000) { // Less than 1 minute
+                display.className = 'time-remaining time-critical';
+            } else if (milliseconds < 120000) { // Less than 2 minutes
+                display.className = 'time-remaining time-warning';
+            } else {
+                display.className = 'time-remaining';
+            }
+        }
+        
+        function handleTokenExpired() {
+            alert('⏰ Your token has expired! You will be redirected to the error page.');
+            window.location.href = 'rejected.html?reason=Token%20expired&details=Your%20session%20token%20has%20expired.%20Please%20launch%20the%20content%20again.';
+        }
+        
+        function testExpiredToken() {
+            if (confirm('This will simulate an expired token and redirect you to the error page. Continue?')) {
+                clearInterval(timeRemainingInterval);
+                window.location.href = 'rejected.html?reason=Token%20expired&details=Token%20expired%2030%20seconds%20ago.%20Please%20launch%20the%20content%20again%20from%20the%20LMS.';
+            }
+        }
+        
+        // Start validation on page load
+        validateAndLoadContent();
+    </script>
+</body>
+</html>
