@@ -4,12 +4,43 @@ This document provides ready-to-use portfolio item descriptions for each of the 
 
 ---
 
+## ⚡ Quick Start: Understanding the 600-Character Limit
+
+**Upwork Portfolio Constraint**: Upwork limits project descriptions to **600 characters maximum** (not words—characters including spaces and punctuation).
+
+### How to Use This Document
+
+1. **For Upwork Upload**: Copy the "Short Description (600 chars max)" section for each demo—these are pre-optimized to fit within Upwork's character limit.
+
+2. **For Reference**: The "Full Description (for reference)" sections contain comprehensive technical details. Use these when:
+   - Writing custom proposals
+   - Answering client questions
+   - Creating supplementary documentation
+   - Preparing for interviews
+
+3. **Screenshots**: The "Screenshots Available" section lists actual files in `/home/ubuntu/Uploads/` with descriptions of what each shows. Upload the recommended screenshots directly to each Upwork portfolio item.
+
+### Character Count Tips
+
+- **Check Before Posting**: Use an online character counter or text editor with character count
+- **Prioritize Impact**: Lead with results and technical achievements
+- **Use Action Verbs**: "Developed," "Built," "Implemented" are more powerful than "Created"
+- **Quantify When Possible**: "90% smaller packages" is more compelling than "smaller packages"
+
+---
+
 ## Portfolio Item 1: SCORM Light Wrapper - Minimal LMS Integration Solution
 
 ### 📊 Project Title
 **SCORM Light Wrapper: Lightweight LMS Package for External Content**
 
-### 📝 Project Description
+### 📝 Short Description (600 characters max)
+
+Developed an innovative "SCORM Light" solution enabling external web content to integrate with Learning Management Systems through a minimal SCORM 1.2 wrapper. Implemented the SCORM "API Hunt" pattern and secure postMessage protocols for cross-domain messaging. This approach reduces package size by 90% while maintaining full compatibility with SCORM 1.2-compliant platforms (Moodle, SCORM Cloud, Blackboard). Successfully validated on SCORM Cloud with comprehensive error handling and origin validation for security.
+
+**Character count: 517** ✅
+
+### 📝 Full Description (for reference)
 
 Developed an innovative "SCORM Light" solution that enables external web content to integrate with Learning Management Systems (LMS) through a minimal SCORM 1.2 wrapper. This architecture allows content hosted on external servers (GitHub Pages, CDNs) to communicate completion status to LMS platforms without requiring full SCORM implementation within the content itself.
 
@@ -40,11 +71,17 @@ Successfully validated completion tracking on SCORM Cloud test environment, demo
 - **GitHub Repository:** https://github.com/ericbenong1/scorm-demos
 - **Technical Documentation:** https://github.com/ericbenong1/scorm-demos/blob/main/PROPOSAL_DEMOS.md#demo-1-scorm-light-wrapper
 
-### 📸 Screenshot Suggestions
-1. Upload: `image.png` - Shows the external content interface with "Mark Complete" button
-2. Upload: Screenshot of SCORM Cloud validation showing successful launch
-3. Upload: Screenshot of the SCORM wrapper code showing API Hunt pattern
-4. Upload: Diagram showing Parent Window (SCORM wrapper) ↔ Child Window (external content) architecture
+### 📸 Screenshots Available
+
+**Note**: Demo 1 currently has no dedicated screenshots in `/home/ubuntu/Uploads/`. The following are recommended screenshots to create:
+
+**Screenshots to Create**:
+1. **SCORM Cloud Validation** - Screenshot showing successful SCORM package upload and launch on SCORM Cloud
+2. **External Content Interface** - The demo page at https://ericbenong1.github.io/scorm-demos/demo1_scorm_light/external_content/ showing the "Mark Complete" button
+3. **SCORM Wrapper Code** - Screenshot of `scorm_api_proxy.js` highlighting the API Hunt function
+4. **Architecture Diagram** - Visual showing Parent Window (SCORM wrapper) ↔ Child Window (external content) communication flow
+
+**Recommended Upload**: Screenshot #1 (SCORM Cloud validation) as it provides the strongest proof of real-world LMS compatibility.
 
 ---
 
@@ -53,7 +90,13 @@ Successfully validated completion tracking on SCORM Cloud test environment, demo
 ### 📊 Project Title
 **postMessage Security Tutorial: Cross-Domain Communication Best Practices**
 
-### 📝 Project Description
+### 📝 Short Description (600 characters max)
+
+Built an interactive tutorial demonstrating secure cross-domain communication using JavaScript postMessage API. Features bidirectional parent-child messaging with four message types (ping, greeting, completion, custom), configurable origin validation with visual security warnings, real-time message logging, and acknowledgment workflows. Directly addresses SCORM Light requirements for iframe-to-wrapper communication. Includes educational content on origin validation risks and wildcards.
+
+**Character count: 484** ✅
+
+### 📝 Full Description (for reference)
 
 Built an interactive educational demo demonstrating secure cross-domain communication patterns using the JavaScript postMessage API. This tutorial serves as both a proof-of-concept and a teaching tool for implementing reliable parent-child window communication with proper origin validation and acknowledgment workflows.
 
@@ -85,11 +128,21 @@ This implementation directly addresses the core technical requirements of SCORM 
 - **GitHub Repository:** https://github.com/ericbenong1/scorm-demos/tree/main/demo2_postmessage
 - **Technical Documentation:** https://github.com/ericbenong1/scorm-demos/blob/main/PROPOSAL_DEMOS.md#demo-2-postmessage-communication-tutorial
 
-### 📸 Screenshot Suggestions
-1. Upload: `screencapture-ericbenong1-github-io-scorm-demos-demo2-postmessage-parent-html-2026-01-31-15_40_23.png` - Shows parent and child windows with message logs
-2. Upload: Screenshot showing security warning when origin validation is disabled
-3. Upload: Screenshot of message acknowledgment flow with timestamps
-4. Upload: Code snippet showing origin validation logic
+### 📸 Screenshots Available
+
+**Available in `/home/ubuntu/Uploads/`**:
+
+1. **`image.png`** (235 KB)
+   - Shows: Parent and Child windows side-by-side with active communication
+   - Content: Configuration section with "Validate Origin" checkbox, "Allowed Origins" textarea, "Received Messages" log showing JSON message structure, and child window with message buttons
+   - Best for: Demonstrating the full dual-window interface and message flow
+
+2. **`screencapture-ericbenong1-github-io-scorm-demos-demo2-postmessage-parent-html-2026-01-31-15_40_23.png`** (677 KB)
+   - Shows: Complete demo page including the "Understanding postMessage Security" educational section at the bottom
+   - Content: Full tutorial view with parent/child windows, message logs, AND educational content explaining Origin Validation, Target Origin, Acknowledgment Pattern, and beforeunload Handling
+   - Best for: Showcasing the tutorial's educational value and comprehensive documentation
+
+**Recommended Upload**: Screenshot #2 (full page) as it demonstrates both functionality AND educational content, showing this is a complete learning resource, not just a code demo.
 
 ---
 
@@ -98,7 +151,13 @@ This implementation directly addresses the core technical requirements of SCORM 
 ### 📊 Project Title
 **Token-Based Launch Security: SCORM Content Authentication System**
 
-### 📝 Project Description
+### 📝 Short Description (600 characters max)
+
+Designed a proof-of-concept token-based authentication system for securing SCORM content launches. Generates HMAC-like signed tokens binding users to courses with 5-minute expiration and unique session IDs. Features launcher page, protected content with real-time validation, rejection page with error handling, and visual countdown timers with color-coded warnings. Includes production PHP implementation guidelines for server-side generation, database validation, and secure secret management. Prevents token forgery and replay attacks.
+
+**Character count: 531** ✅
+
+### 📝 Full Description (for reference)
 
 Designed and implemented a proof-of-concept token-based authentication system for securing SCORM content launches in LMS environments. This demo simulates enterprise-grade security patterns used by major LMS platforms to prevent unauthorized access to course content through short-lived, cryptographically signed tokens.
 
@@ -131,11 +190,30 @@ While the demo uses client-side JavaScript for proof-of-concept purposes, it inc
 - **GitHub Repository:** https://github.com/ericbenong1/scorm-demos/tree/main/demo3_token_security
 - **Technical Documentation:** https://github.com/ericbenong1/scorm-demos/blob/main/demo3_token_security/README.md
 
-### 📸 Screenshot Suggestions
-1. Upload: `screencapture-ericbenong1-github-io-scorm-demos-demo3-token-security-launcher-html-2026-01-31-17_32_46.png` - Shows LMS launcher with token generation
-2. Upload: Screenshot of protected content page with token countdown timer
-3. Upload: Screenshot of rejection page showing expired token error
-4. Upload: Code snippet showing token validation logic with security highlights
+### 📸 Screenshots Available
+
+**Available in `/home/ubuntu/Uploads/`**:
+
+1. **`screencapture-ericbenong1-github-io-scorm-demos-demo3-token-security-launcher-html-2026-01-31-17_32_46.png`** (2.7 MB)
+   - Shows: Complete LMS Launch Simulator page with token generation interface
+   - Content: "Simulated LMS Launch Page" with User ID and Course ID input fields, "Launch Content" button, AND comprehensive educational sections explaining "Understanding Token-Based Launch Security" with bullet points on User Binding, Time-Limited, Signature Verification, and Session Binding, PLUS "Production Implementation (PHP Example)" with server-side code
+   - Best for: Demonstrating both the functional demo AND production-ready implementation guidance, showing enterprise-level security understanding
+
+**Screenshots to Create** (Recommended for complete portfolio):
+
+2. **Protected Content Page** - Screenshot of `content.html` showing:
+   - Token validation success message
+   - User/course information display
+   - Real-time countdown timer (showing green/yellow/red states)
+   - "Time Remaining" indicator with seconds countdown
+
+3. **Rejection Page** - Screenshot of `rejected.html` showing:
+   - "Access Denied" error message
+   - Reason for rejection (expired/invalid/missing token)
+   - Technical details panel
+   - "Launch Content Again" button
+
+**Recommended Upload**: Screenshot #1 (launcher page) as it provides the most comprehensive view of the security architecture, educational content, and production implementation examples all in one image.
 
 ---
 
