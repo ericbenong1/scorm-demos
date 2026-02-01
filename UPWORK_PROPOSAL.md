@@ -1,12 +1,63 @@
 # Upwork Proposal: SCORM Package Conversion Specialist
 
-**For:** Conversion of Existing SCORM Packages to Support External Content via Relay/Proxy  
-**Date:** January 31, 2026  
-**Prepared by:** Eric Benson
+**Date:** January 31, 2026
 
 ---
 
-## Opening
+## 🎯 **The Short Version (Upwork-Optimized)**
+
+Hi there—I built three working demos this week specifically to prove I can convert your SCORM packages for external content hosting. Let's skip the credentials and go straight to the proof.
+
+### **See It Working**
+I spent 4.5 hours building what you're describing:
+- ✅ **SCORM Light Wrapper** - Validated on ScormCloud ([Live Demo](https://ericbenong1.github.io/scorm-demos/demo1_scorm_light/external_content/))
+- 📡 **postMessage Security Tutorial** - Cross-domain communication with origin validation ([Live Demo](https://ericbenong1.github.io/scorm-demos/demo2_postmessage/parent.html))
+- 🔐 **Token Security Simulator** - User/course binding with expiration ([Live Demo](https://ericbenong1.github.io/scorm-demos/demo3_token_security/launcher.html))
+
+Full technical docs: https://github.com/ericbenong1/scorm-demos
+
+### **Why This Matters for You**
+You're dealing with the classic SCORM headache: external content that needs to talk to the LMS wrapper without breaking cross-domain security. Your packages probably embed everything in one zip, but you want to host content separately while still tracking completion reliably. I've managed LMS implementations where this exact problem cost weeks of debugging.
+
+The demos prove I understand the three critical pieces: (1) SCORM API communication with the LMS, (2) secure postMessage relay between wrapper and iframe, and (3) completion acknowledgment patterns that don't fail silently.
+
+### **My Background (The Quick Version)**
+15+ years building SCORM content in Articulate Storyline and managing LMS systems (Saba, Moodle, ScormCloud). I've shipped hundreds of SCORM packages and debugged cross-browser tracking issues countless times. I haven't built custom SCORM wrappers from scratch before—I've always used authoring tools—but I know SCORM's quirks intimately.
+
+**Full transparency:** I used AI tools (Claude) to build these demos. I'm not a JavaScript developer by trade, but I know how to troubleshoot, test, and validate solutions. The demos work because I understand both the instructional design requirements and technical constraints.
+
+### **How I'd Tackle Your Project**
+1. **Analyze your packages** - Authoring tool? SCORM version? Current completion tracking?
+2. **Build lightweight wrapper** - Minimal SCORM package with API hunt and iframe embedding
+3. **Implement secure messaging** - postMessage with origin validation and acknowledgments
+4. **Test thoroughly** - ScormCloud validation, cross-browser testing, failure handling
+5. **Document everything** - Clear hosting and configuration instructions
+
+### **Timeline & Reality Check**
+**15-25 hours** for initial implementation and testing based on my demo build time. Could be less if your packages are straightforward, more if there are custom interactions. I'd propose milestones so you can validate progress.
+
+**Limitations:** If your content has advanced Storyline features (variables between slides, complex branching affecting completion), we might need custom solutions. I'll need your existing packages to assess feasibility.
+
+### **Questions I Need Answered**
+1. What authoring tool created your SCORM packages (Storyline, Captivate, custom)?
+2. What LMS are you using? SCORM 1.2 or 2004?
+3. Where will external content be hosted (your CDN, GitHub Pages)?
+4. What triggers completion—just finishing, or scores/time/interactions?
+
+### **Let's Talk**
+I'm not claiming 100 previous projects like this—I haven't done it before. But I've proven I can figure it out quickly and deliver working solutions. The demos are live right now for you to test. If they demonstrate what you need, let's discuss your specific packages.
+
+More detail: https://github.com/ericbenong1/scorm-demos/blob/main/PROPOSAL_DEMOS.md
+
+---
+
+## 📚 **ORIGINAL LONG-FORM PROPOSAL (FOR REFERENCE)**
+
+*Below is the comprehensive version with all technical details, use cases, and background. The section above is optimized for Upwork's format, but if you prefer detailed documentation, this section covers everything.*
+
+---
+
+## Opening (Original)
 
 I'm an instructional designer with 15+ years of experience developing SCORM-compliant eLearning content and managing LMS implementations. While I haven't built SCORM relay systems in production environments before, I've developed three working proof-of-concept demos specifically for this project that demonstrate my ability to deliver what you need—with the help of modern AI development tools.
 
