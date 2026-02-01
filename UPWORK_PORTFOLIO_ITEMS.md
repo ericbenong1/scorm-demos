@@ -17,17 +17,14 @@ The solution implements the SCORM "API Hunt" pattern to locate LMS communication
 
 Successfully validated completion tracking on SCORM Cloud test environment, demonstrating real-world LMS compatibility. The implementation includes comprehensive error handling, origin validation for security, and graceful fallbacks for edge cases where SCORM API is unavailable.
 
-### 🛠️ Skills Used
-- SCORM 1.2 / SCORM 2004
-- JavaScript
-- Cross-Domain Communication
-- Learning Management Systems (LMS)
-- API Integration
-- HTML5
-- iframe Security
-- Web Development
-- Technical Documentation
-- eLearning Development
+### 🛠️ Skills Used (Upwork 5-Skill Limit)
+- **SCORM 1.2 / SCORM 2004** - Core requirement and main focus of demo
+- **JavaScript** - Primary implementation language
+- **Learning Management Systems (LMS)** - Platform integration target
+- **Cross-Domain Communication** - Key technical challenge solved
+- **eLearning Development** - Industry context and application
+
+> **Note:** Upwork limits portfolio items to 5 skills. These were selected to maximize job match relevance (SCORM, JavaScript, LMS) while showcasing the demo's unique technical contributions (cross-domain communication) and industry context.
 
 ### 📦 Deliverables
 - ✅ Functional SCORM 1.2 package with imsmanifest.xml
@@ -64,18 +61,14 @@ The demo showcases four message types (ping, greeting, completion, custom) with 
 
 This implementation directly addresses the core technical requirements of SCORM Light architecture, where embedded iframes must securely communicate completion signals to parent SCORM wrappers. The tutorial includes educational sections explaining origin validation risks, wildcardorigin patterns (*), and beforeunload handling for preventing data loss.
 
-### 🛠️ Skills Used
-- JavaScript
-- postMessage API
-- Cross-Domain Security
-- Web Security
-- iframe Communication
-- Event-Driven Architecture
-- HTML5
-- CSS3
-- User Interface Design
-- Technical Education
-- Documentation
+### 🛠️ Skills Used (Upwork 5-Skill Limit)
+- **JavaScript** - Primary implementation language
+- **postMessage API** - Specific API demonstrated
+- **Cross-Domain Security** - Core security challenge solved
+- **iframe Communication** - Key technical pattern showcased
+- **Web Security** - Broader security architecture context
+
+> **Note:** These 5 skills emphasize the demo's security focus (cross-domain security, web security) and specific technical implementation (postMessage API, iframe communication) while maintaining job match relevance with JavaScript.
 
 ### 📦 Deliverables
 - ✅ Interactive parent-child communication demo
@@ -113,18 +106,14 @@ The system generates HMAC-like signed tokens that bind specific users to specifi
 
 While the demo uses client-side JavaScript for proof-of-concept purposes, it includes comprehensive production implementation guidelines with PHP code examples demonstrating server-side token generation, database validation, and secure secret key management. This architecture prevents token forgery, replay attacks, and unauthorized content access.
 
-### 🛠️ Skills Used
-- Authentication & Authorization
-- Web Security
-- Token-Based Authentication
-- Cryptography (HMAC)
-- JavaScript
-- PHP (documented examples)
-- User Experience Design
-- Security Architecture
-- Learning Management Systems
-- Real-Time Validation
-- Error Handling
+### 🛠️ Skills Used (Upwork 5-Skill Limit)
+- **Authentication & Authorization** - Core security concept demonstrated
+- **Token-Based Authentication** - Specific technique implemented
+- **Web Security** - Overall security architecture focus
+- **JavaScript** - Client-side implementation language
+- **PHP** - Server-side production examples (job requirement)
+
+> **Note:** These 5 skills prioritize authentication/security expertise (authentication & authorization, token-based authentication, web security) while covering both client-side (JavaScript) and server-side (PHP) implementation languages mentioned in job postings.
 
 ### 📦 Deliverables
 - ✅ Token generation simulation with Web Crypto API
@@ -152,12 +141,25 @@ While the demo uses client-side JavaScript for proof-of-concept purposes, it inc
 
 ## 📋 General Portfolio Guidelines
 
+### ⚠️ Important: Upwork 5-Skill Limit
+
+**Upwork restricts portfolio items to exactly 5 skills.** Each demo originally showcased 8-11 technical skills, but the selections above represent the **most strategic choices** for:
+
+1. **Job Match Relevance**: Prioritizing skills frequently mentioned in SCORM/eLearning job postings (SCORM, JavaScript, PHP, LMS)
+2. **Search Discoverability**: Choosing skills that potential clients search for (Authentication, Web Security, Cross-Domain Communication)
+3. **Unique Value Demonstration**: Highlighting the specific technical challenges solved by each demo
+
+**Selection Strategy by Demo:**
+- **Demo 1**: Emphasizes SCORM expertise + cross-domain technical capability
+- **Demo 2**: Balances JavaScript proficiency with security focus (2 security skills)
+- **Demo 3**: Showcases authentication expertise with both client/server languages
+
 ### How to Use These Descriptions
 
 1. **Copy Entire Sections**: Each portfolio item above can be copied directly into Upwork's "Add Portfolio Item" form
 2. **Upload Screenshots**: Use the suggested screenshots from `/home/ubuntu/Uploads` folder (already uploaded)
 3. **Verify Links**: All GitHub and live demo links are functional and public
-4. **Skills Tags**: When adding portfolio items, select the skills listed under "Skills Used" to improve discoverability
+4. **Skills Tags**: When adding portfolio items, select the **exact 5 skills** listed under "Skills Used" for each demo
 5. **Order Recommendation**: Display in order 1, 2, 3 as each builds on concepts from the previous demo
 
 ### Key Selling Points to Emphasize
